@@ -54,5 +54,7 @@ Using default Postgres settings and 11 threads in geocoding.py, 1000 addresses c
 # System Specifications
 
 CPU: Ryzen 5 3600 
+
 RAM: 16 GB DDR4 3200 Mhz
+
 SSD: Corsair Force MP510 
