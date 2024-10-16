@@ -35,12 +35,12 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
 
-# Dataset Used:
+## Dataset Used:
 September 2024 Data Dissemination From cms.gov
 
 Most-up-to-date version can be found at the following [link](https://www.cms.gov/medicare/regulations-guidance/administrative-simplification/data-dissemination).
 
-# Geocoding Services Used:
+## Geocoding Services Used:
 Nominatim's free [open-source geocoding](https://nominatim.org/) was used along with data from OpenStreetMap data. Instead of using their rate limited online API, install the database on your local machine. 
 
 Installation instructions can be found at this [link](https://nominatim.org/release-docs/latest/admin/Installation/)
@@ -51,7 +51,7 @@ OpenStreetMap data can be downloaded by going to the downloads link at [geofabri
 
 Using default Postgres settings and 11 threads in geocoding.py, 1000 addresses could be geocoded every 3 minutes and 19 seconds.
 
-# System Specifications
+## System Specifications
 
 CPU: Ryzen 5 3600 
 
