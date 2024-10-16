@@ -38,7 +38,7 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 ## Dataset Used:
 September 2024 Data Dissemination From cms.gov
 
-Most-up-to-date version can be found at the following [link](https://www.cms.gov/medicare/regulations-guidance/administrative-simplification/data-dissemination).
+The dataset is updated weekly and a new version is released each month with all the weekly changes made. The most-up-to-date version can be found at the following [link](https://www.cms.gov/medicare/regulations-guidance/administrative-simplification/data-dissemination).
 
 ## Geocoding Services Used:
 Nominatim's free [open-source geocoding](https://nominatim.org/) was used along with data from OpenStreetMap data. Instead of using their rate limited online API, install the database on your local machine. 
