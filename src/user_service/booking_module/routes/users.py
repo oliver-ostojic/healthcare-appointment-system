@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from pydantic import ValidationError
-from user_service.mongodb_connection import users_collection
+from src.user_service.mongodb_connection import users_collection
 from ..models.user import User
 
 users_bp = Blueprint('users_bp', __name__)
