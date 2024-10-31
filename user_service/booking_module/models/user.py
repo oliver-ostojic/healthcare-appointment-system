@@ -57,6 +57,10 @@ class User(BaseModel):
     def full_name(self) -> str:
         return f"{self.name['first']} {self.name['last']}"
 
+    def cancel_one_appointment(self, appointment_id: PyObjectId) -> None:
+        # Make sure to update availability, and appointment_status
+        pass
+
     class Config:
         allow_population_by_field_name = True
         arbitrary_types_allowed = True
