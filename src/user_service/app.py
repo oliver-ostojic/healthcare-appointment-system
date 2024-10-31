@@ -1,7 +1,6 @@
 from flask import Flask
-from .mongodb_connection import client, test_connection
-from .routes.users import users_bp
-from bson import ObjectId
+from mongodb_connection import client, test_connection
+from booking_module.routes.users import users_bp
 
 
 def create_app():
