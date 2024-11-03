@@ -1,9 +1,15 @@
 from pymongo.mongo_client import MongoClient
 import certifi
+import os
+from dotenv import load_dotenv
 
-uri = "mongodb+srv://oliverostojic:903TL6h24xAYGHSX@healthcare-db.llehg.mongodb.net/?retryWrites=true&w=majority&appName=healthcare-db"
+load_dotenv()
+
+uri = os.getenv("MONGODB_URI")
+db_name = os.getenv("DB_NAME")
+
 client = MongoClient(uri, tlsCAFile=certifi.where())
-db = client["healthcare-db"]
+db = client[db_name]
 users_collection = db["users"]
 
 
