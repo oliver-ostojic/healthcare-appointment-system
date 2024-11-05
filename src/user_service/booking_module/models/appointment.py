@@ -18,7 +18,7 @@ class Appointment(BaseModel):
     user_id: ObjectId
     provider_id: ObjectId
     start_datetime: datetime
-    status: AppointmentStatus
+    status: AppointmentStatus = AppointmentStatus.UPCOMING
     duration: timedelta
     reason: str
     notes: Optional[str] = ""

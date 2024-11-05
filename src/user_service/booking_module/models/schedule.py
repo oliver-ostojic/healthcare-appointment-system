@@ -32,5 +32,5 @@ class Schedule(BaseModel):
     def get_monthly_availability(self) -> List[Slot]:
         pass
 
-    def free_slot_availability(self, start_time: datetime) -> None:
+    def is_slot_available(self, start_time: datetime) -> bool:
         pass

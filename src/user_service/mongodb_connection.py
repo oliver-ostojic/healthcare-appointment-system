@@ -11,6 +11,7 @@ db_name = os.getenv("DB_NAME")
 client = MongoClient(uri, tlsCAFile=certifi.where())
 db = client[db_name]
 users_collection = db["users"]
+provider_schedules_collection = db["provider_schedules"]
 
 
 def test_connection():

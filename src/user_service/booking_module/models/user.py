@@ -3,6 +3,7 @@ from pydantic import BaseModel, EmailStr, Field
 from typing import Optional, List
 from bson import ObjectId
 from enum import Enum
+from appointment import Appointment
 
 
 # Helper class for handling MongoDB ObjectID in Pydantic
@@ -49,7 +50,7 @@ class User(BaseModel):
     email: EmailStr
     date_of_birth: datetime
     hashed_password: str
-    appointments: Optional[List[PyObjectId]] = []
+    appointments: Optional[List[Appointment]] = []
     account_status: AccountStatus = Field(default=AccountStatus.ACTIVE)
     insurance: Insurance
     address: Address
