@@ -34,4 +34,27 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-# design-project
+
+## Dataset Used:
+September 2024 Data Dissemination From cms.gov
+
+The dataset is updated weekly and a new version is released each month with all the weekly changes made. The most-up-to-date version can be found at the following [link](https://www.cms.gov/medicare/regulations-guidance/administrative-simplification/data-dissemination).
+
+## Geocoding Services Used:
+Nominatim's free [open-source geocoding](https://nominatim.org/) was used along with data from OpenStreetMap data. Instead of using their rate limited online API, install the database on your local machine. 
+
+Installation instructions can be found at this [link](https://nominatim.org/release-docs/latest/admin/Installation/)
+
+Various options are available. Ubuntu 24.04.1 and Postgres 16 were chosen to create the local database for this project. This process may take 24+ hours depending on your system speed. Additionally, only the data necessary to generate accurate addresses was added to the local database. How to filter out data can be found at this [link](https://nominatim.org/release-docs/latest/admin/Import/). The time is based on system specifications listed below this section.
+
+OpenStreetMap data can be downloaded by going to the downloads link at [geofabrik's website](https://www.geofabrik.de/). The dataset used was of the entire United States, us-latest.osm.pbf, and is roughly 9.9 GB. The file must be converted to .csv format before using preprocess.py or filter.py. The process of converting to a .csv and creating a local database takes a lot of storage, it is recommended to have at least 200 GB free on your SSD.
+
+Using default Postgres settings and 11 threads in geocoding.py, 1000 addresses could be geocoded every 3 minutes and 19 seconds.
+
+## System Specifications
+
+CPU: Ryzen 5 3600 
+
+RAM: 16 GB DDR4 3200 Mhz
+
+SSD: Corsair Force MP510 
