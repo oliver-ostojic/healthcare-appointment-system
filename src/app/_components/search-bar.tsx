@@ -14,21 +14,38 @@ import { useState } from "react";
 
 const SearchBar = () => {
   // States for form fields
-  const [location, setLocation] = useState("");
+  const [street, setStreet] = useState("");
+  const [city, setCity] = useState("");
+  const [state, setState] = useState("");
+  const [zipCode, setZipCode] = useState("");
+  const [radius, setRadius] = useState("");
   const [condition, setCondition] = useState("");
   const [insurance, setInsurance] = useState<string | undefined>(undefined);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault(); // Prevent form from refreshing the page
 
-    // Handle form submission logic (e.g., API request or search logic)
-    console.log("Location:", location);
-    console.log("Medical Condition:", condition);
-    console.log("Insurance:", insurance);
+    try {
+      const response = await fetch("http://localhost:5000/api/search", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          street,
+          city,
+          state,
+          zip_code: zipCode,
+          condition,
+          insurance,
+        }),
+      });
 
-    alert(
-      `Form submitted!\nLocation: ${location}\nCondition: ${condition}\nInsurance: ${insurance}`
-    );
+      const data = await response.json();
+      console.log("Search Results:", data);
+    } catch (error) {
+      console.error("Error during fetch:", error);
+    }
   };
 
   return (
@@ -40,22 +57,51 @@ const SearchBar = () => {
         <div className="flex flex-col space-y-2">
           <Input
             className="max-w-lg flex-1 bg-white p-2"
-            placeholder="Enter your location"
+            placeholder="Street Address"
             type="text"
+            value={street} // Bind to street state
+            onChange={(e) => setStreet(e.target.value)} // Update street state on input change
           />
           <Input
             className="max-w-lg flex-1 bg-white p-2"
-            placeholder="Radius (miles)"
-            type="number"
+            placeholder="City"
+            type="text"
+            value={city} // Bind to city state
+            onChange={(e) => setCity(e.target.value)} // Update city state on input change
+          />
+          <Input
+            className="max-w-lg flex-1 bg-white p-2"
+            placeholder="State"
+            type="text"
+            value={state} // Bind to state state
+            onChange={(e) => setState(e.target.value)} // Update state state on input change
+          />
+          <Input
+            className="max-w-lg flex-1 bg-white p-2"
+            placeholder="Zip Code"
+            type="text"
+            value={zipCode} // Bind to zip code state
+            onChange={(e) => setZipCode(e.target.value)} // Update zip code state on input change
+          />
+          <Input
+            className="max-w-lg flex-1 bg-white p-2"
+            placeholder="Radius"
+            type="text"
+            value={radius} // Bind to radius state
+            onChange={(e) => setRadius(e.target.value)} // Update radius state on input change
+          />
+          <Input
+            className="max-w-lg flex-1 bg-white p-2"
+            placeholder="Medical Condition"
+            type="text"
+            value={condition} // Bind to condition state
+            onChange={(e) => setCondition(e.target.value)} // Update condition state on input change
           />
         </div>
         <div className="flex flex-col space-y-2">
-          <Input
-            className="max-w-lg flex-1 bg-white p-2"
-            placeholder="Medical condition"
-            type="text"
-          />
-          <Select>
+          <Select
+            onValueChange={(value) => setInsurance(value)} // Update insurance state on selection change
+          >
             <SelectTrigger className="bg-white text-gray-700 p-2">
               <SelectValue placeholder="Insurance" />
             </SelectTrigger>

@@ -2,3 +2,5 @@ pymongo
 geojson
 numpy
 pandas
+Flask
+flask-cors
