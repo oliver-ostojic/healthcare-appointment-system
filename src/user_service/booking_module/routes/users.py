@@ -146,7 +146,7 @@ def book_appointment(user_id):
             return jsonify({'error': str(e)}), 500
 
 
-@users_bp.route('/<user_id>/appointment/<apt_id>/cancel', methods=['GET'])
+@users_bp.route('/<user_id>/appointment/<apt_id>', methods=['DEL'])
 def cancel_appointment(user_id, apt_id):
     # Verify token
     auth_result = verify_token(user_id)
@@ -160,13 +160,7 @@ def cancel_appointment(user_id, apt_id):
     with client.start_session() as session:
         session.start_transaction()
         try:
-            # Update appointment status to cancelled
-            users_collection.update_one({'_id': ObjectId(user_id)},
-                                        {'$set': {'appointments.$[elem].status': 'canceled'}},
-                                        array_filters=[{'elem._id': ObjectId(apt_id)}],
-                                        session=session
-                                        )
-            # Get the appointment
+            # Get the user data
             user = users_collection.find_one({'_id': ObjectId(user_id)})
             if not user or 'appointments' not in user:
                 return jsonify({'message': 'User or Appointment not found'}), 404
@@ -174,6 +168,10 @@ def cancel_appointment(user_id, apt_id):
             appointment = next((apt for apt in user['appointments'] if apt['_id'] == ObjectId(apt_id)), None)
             if not appointment:
                 return jsonify({'message': 'Appointment not found'}), 404
+            # Delete appointment with apt_id
+            users_collection.update_one({'_id': ObjectId(user_id)},
+                                        {'$pull': {'appointments': {'_id': ObjectId(apt_id)}}},
+                                        session=session)
             # Get the provider_id from the appointment
             provider_id = appointment.get('provider_id')
             # Get the start time from the appointment

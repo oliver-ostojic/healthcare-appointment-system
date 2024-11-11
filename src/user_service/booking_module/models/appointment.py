@@ -10,8 +10,6 @@ from typing import Optional
 class AppointmentStatus(str, Enum):
     UPCOMING = "upcoming"
     PASSED = "passed"
-    MISSED = "missed"
-    CANCELED = "canceled"
 
 
 class Appointment(BaseModel):
