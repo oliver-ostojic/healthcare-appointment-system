@@ -2,7 +2,7 @@ import pandas as pd
 from pymongo import MongoClient
 
 # Connect to MongoDB
-client = MongoClient("mongodb+srv://al6894:design@dev-cluster.7q4va.mongodb.net/")
+client = MongoClient("")
 db = client["MedConnect"]
 specialty_collection = db["specialty"]
 

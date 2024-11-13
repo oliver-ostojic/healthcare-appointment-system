@@ -86,10 +86,10 @@ def search():
     }
     # Look up the taxonomy code for the given specialty
     if specialty:
-        taxonomy_doc = db["specialty"].find_one({"name": {"$regex": specialty, "$options": "i"}})
+        taxonomy_doc = db["specialty"].find_one({"display_name": {"$regex": specialty, "$options": "i"}})
         if taxonomy_doc:
-            taxonomy_code = taxonomy_doc.get("taxonomy_code")
-            query["taxonomy_code"] = taxonomy_code
+            taxonomy_code = taxonomy_doc.get("code")
+            query["taxonomy_codes"] = {"$in": [taxonomy_code]}  # Check if taxonomy_code is in the array
         else:
             return jsonify({"error": "Specialty not found"}), 400
 

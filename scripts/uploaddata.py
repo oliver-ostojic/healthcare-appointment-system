@@ -1,7 +1,7 @@
 import json
 from pymongo import MongoClient
 
-mongo_uri = "mongodb+srv://al6894:<dbpassword>@dev-cluster.7q4va.mongodb.net/"
+mongo_uri = ""
 database_name = "MedConnect"
 collection_name = "provider-data"
 
