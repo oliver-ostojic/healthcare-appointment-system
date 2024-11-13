@@ -19,7 +19,7 @@ const SearchBar = () => {
   const [state, setState] = useState("");
   const [zipCode, setZipCode] = useState("");
   const [radius, setRadius] = useState("");
-  const [condition, setCondition] = useState("");
+  const [specialty, setSpecialty] = useState("");
   const [insurance, setInsurance] = useState<string | undefined>(undefined);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -36,7 +36,7 @@ const SearchBar = () => {
           city,
           state,
           zip_code: zipCode,
-          condition,
+          specialty,
           insurance,
         }),
       });
@@ -92,10 +92,10 @@ const SearchBar = () => {
           />
           <Input
             className="max-w-lg flex-1 bg-white p-2"
-            placeholder="Medical Condition"
+            placeholder="Provider Specialty"
             type="text"
-            value={condition} // Bind to condition state
-            onChange={(e) => setCondition(e.target.value)} // Update condition state on input change
+            value={specialty} // Bind to condition state
+            onChange={(e) => setSpecialty(e.target.value)} // Update condition state on input change
           />
         </div>
         <div className="flex flex-col space-y-2">

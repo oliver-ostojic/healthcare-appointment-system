@@ -10,7 +10,7 @@ import requests
 
 app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000"}})
-client = MongoClient("")
+client = MongoClient("mongodb+srv://al6894:design@dev-cluster.7q4va.mongodb.net/")
 db = client.MedConnect
 
 # Test the connection by listing the collections in your database
@@ -58,8 +58,8 @@ def search():
     city = data.get("city")
     state = data.get("state")
     zip_code = data.get("zip")
-    #condition = data.get("condition")
-    #insurance = data.get("insurance")
+    specialty = data.get("specialty")
+    insurance = data.get("insurance")
     radius_miles = data.get("radius", 10)  # Radius in miles
 
     radius_miles = 10
@@ -84,18 +84,26 @@ def search():
             }
         }
     }
-    # if condition:
-    #     query["condition"] = {"$regex": condition, "$options": "i"}
-    # if insurance:
-    #     query["insurance"] = insurance
+    # Look up the taxonomy code for the given specialty
+    if specialty:
+        taxonomy_doc = db["specialty"].find_one({"name": {"$regex": specialty, "$options": "i"}})
+        if taxonomy_doc:
+            taxonomy_code = taxonomy_doc.get("taxonomy_code")
+            query["taxonomy_code"] = taxonomy_code
+        else:
+            return jsonify({"error": "Specialty not found"}), 400
+
+    # Add insurance filter if provided
+    if insurance:
+        query["insurance"] = {"$regex": insurance, "$options": "i"}
 
     try:
         results = list(db["provider-data"].find(query))
-        print("Query results:", results)  # Debugging log
+        print("Query results:", results)
         return jsonify(results), 200
     except Exception as e:
-        print("Error querying the database:", e)  # Print full error message
-        return jsonify({"error": str(e)}), 500  # Return error message for frontend debugging
+        print("Error querying the database:", e)
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)
