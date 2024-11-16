@@ -1,3 +1,3 @@
-from .user import User, PyObjectId
+from .user import User
 # Add future models here
-__all__ = ['User', 'PyObjectId']
+__all__ = ['User']

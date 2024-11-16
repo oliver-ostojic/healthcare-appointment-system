@@ -1,9 +1,8 @@
-# Imports
 from datetime import datetime, timedelta
 from enum import Enum
 from pydantic import BaseModel
-from bson import ObjectId
 from typing import Optional
+from .objectid_utils import ObjectId
 
 
 # Class Definitions
@@ -20,10 +19,3 @@ class Appointment(BaseModel):
     duration: timedelta
     reason: str
     notes: Optional[str] = ""
-
-    def cancel_appointment(self) -> None:
-        self.status = AppointmentStatus.CANCELED
-
-    def update_status(self, status: AppointmentStatus) -> None:
-        pass
-

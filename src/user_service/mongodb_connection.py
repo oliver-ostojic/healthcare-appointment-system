@@ -19,4 +19,4 @@ def test_connection():
         client.admin.command("ping")
         print("Pinged your deployment. Successfully connected to MongoDB!")
     except Exception as e:
-        print(f"Error connecting to MongoDB: {e}")
+        print("Error connecting to MongoDB: {}".format(e))

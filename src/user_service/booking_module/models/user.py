@@ -1,22 +1,8 @@
 from datetime import datetime
 from pydantic import BaseModel, EmailStr, Field
 from typing import Optional, List
-from bson import ObjectId
 from enum import Enum
-from appointment import Appointment
-
-
-# Helper class for handling MongoDB ObjectID in Pydantic
-class PyObjectId(ObjectId):
-    @classmethod
-    def __get_validators__(cls):
-        yield cls.validate
-
-    @classmethod
-    def validate(cls, v):
-        if not ObjectId.is_valid(v):
-            raise ValueError("Invalid object id")
-        return ObjectId(v)
+from .appointment import Appointment
 
 
 class AccountStatus(str, Enum):
@@ -57,12 +43,3 @@ class User(BaseModel):
 
     def full_name(self) -> str:
         return f"{self.name['first']} {self.name['last']}"
-
-    def cancel_one_appointment(self, appointment_id: PyObjectId) -> None:
-        # Make sure to update availability, and appointment_status
-        pass
-
-    class Config:
-        allow_population_by_field_name = True
-        arbitrary_types_allowed = True
-        json_encoders = {ObjectId: str}

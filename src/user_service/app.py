@@ -1,7 +1,7 @@
 from flask import Flask
 from dotenv import load_dotenv
 import os
-from mongodb_connection import client, test_connection
+from mongodb_connection import test_connection
 from booking_module.routes.users import users_bp
 
 

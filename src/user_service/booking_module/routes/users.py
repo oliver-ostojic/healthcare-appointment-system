@@ -1,6 +1,6 @@
 import os
 import certifi
-from bson import ObjectId
+from bson.objectid import ObjectId, InvalidId
 from flask import Blueprint, request, jsonify
 from pydantic import ValidationError
 from pymongo import MongoClient
@@ -19,32 +19,6 @@ uri = os.getenv("MONGODB_URI")
 users_bp = Blueprint('users_bp', __name__)
 # Initialize MongoDB client
 client = MongoClient(uri, tlsCAFile=certifi.where())
-
-
-def verify_token(user_id):
-    # Extract the token from the header
-    auth_header = request.headers.get('Authorization')
-    # If the token is not present, return message
-    if not auth_header:
-        return jsonify({'message': 'Missing Authorization header'}), 401
-    # Set token to variable by splitting at " " space
-    token = auth_header.split(" ")[1] if " " in auth_header else auth_header
-    # Decode the token
-    try:
-        decoded_token = jwt.decode(token, SECRET_KEY, algorithms=['HS256'])
-        token_user_id = decoded_token.get('id')
-        # Compare the user_id GET request to token with user_id
-        if str(user_id) != token_user_id:
-            return jsonify({'message': 'Forbidden, you are not allowed to access this resource'}), 403
-        # Token is valid and user is authorized
-        return True
-    # Else return error messages
-    except jwt.ExpiredSignatureError:
-        return jsonify({'message': 'Token has expired'}), 403
-    except jwt.InvalidTokenError:
-        return jsonify({'message': 'Token is invalid'}), 403
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
 
 
 @users_bp.route('/', methods=['POST'])
@@ -69,23 +43,19 @@ def create_user():
 
 @users_bp.route('/<user_id>', methods=['GET'])
 def get_user_info(user_id):
-    # Verify token
-    auth_result = verify_token(user_id)
-    if auth_result is not True:
-        return auth_result
-    user_data = users_collection.find_one({'_id': ObjectId(user_id)})
+    try:
+        user_data = users_collection.find_one({'_id': ObjectId(user_id)})
+    except (InvalidId, ValueError):
+        return jsonify({'message': 'Invalid user ID'}), 400
     if user_data:
-        return jsonify({user_data}), 200
+        user_data['_id'] = str(user_data['_id'])
+        return jsonify(user_data), 200
     else:
         return jsonify({'message': 'User not found'}), 404
 
 
 @users_bp.route('/<user_id>/appointment', methods=['POST'])
 def book_appointment(user_id):
-    # Verify token
-    auth_result = verify_token(user_id)
-    if auth_result is not True:
-        return auth_result
     # Extract data from the request body
     data = request.get_json()
     if not data:
@@ -148,10 +118,6 @@ def book_appointment(user_id):
 
 @users_bp.route('/<user_id>/appointment/<apt_id>', methods=['DEL'])
 def cancel_appointment(user_id, apt_id):
-    # Verify token
-    auth_result = verify_token(user_id)
-    if auth_result is not True:
-        return auth_result
     # Extract data from the request body
     data = request.get_json()
     if not data:
