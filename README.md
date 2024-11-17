@@ -31,12 +31,12 @@ This project uses [`next/font`](https://nextjs.org/docs/app/building-your-applic
 - [x] Book appointments
 - [x] Cancel appointments
 - [x] home.html
-- [] login.html
+- [ ] login.html
 - [x] search.html
-- [] results.html
-- [] book.html
-- [] profile.html
-- [] Chatbot
+- [ ] results.html
+- [ ] book.html
+- [ ] profile.html
+- [ ] Chatbot
 
 ## Learn More
 
