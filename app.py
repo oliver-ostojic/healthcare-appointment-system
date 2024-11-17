@@ -14,7 +14,7 @@ import requests
 app = Flask(__name__)
 csrf = CSRFProtect(app)
 CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000"}})
-client = MongoClient("mongodb+srv://al6894:design@dev-cluster.7q4va.mongodb.net/")
+client = MongoClient("")
 db = client.MedConnect
 
 # Test the connection by listing the collections in your database
