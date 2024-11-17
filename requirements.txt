@@ -4,3 +4,6 @@ numpy
 pandas
 Flask
 flask-cors
+bcrypt
+flask-limiter
+flask-wtf

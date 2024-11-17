@@ -1,7 +1,10 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, session, render_template
 from flask_cors import CORS
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+from flask_wtf.csrf import CSRFProtect
 from pymongo import MongoClient
-#import os
+import bcrypt
 import requests
 #from dotenv import load_dotenv
 
@@ -9,6 +12,7 @@ import requests
 #load_dotenv()
 
 app = Flask(__name__)
+csrf = CSRFProtect(app)
 CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000"}})
 client = MongoClient("mongodb+srv://al6894:design@dev-cluster.7q4va.mongodb.net/")
 db = client.MedConnect
@@ -23,6 +27,12 @@ except Exception as e:
 # indexes = db["provider-data"].index_information()
 # print("Indexes on provider-data collection:", indexes)
 
+# Hash a password
+def hash_password(password):
+    return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+
+def verify_password(password, hashed):
+    return bcrypt.checkpw(password.encode('utf-8'), hashed)
 
 # Uses the U.S. census geocoding service
 def geocode_location(street, city, state, zip_code):
@@ -47,6 +57,48 @@ def geocode_location(street, city, state, zip_code):
         return lat, lon
     else:
         return None, None
+
+collection = db["patient-accounts"]    
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        
+        # Check if the username already exists
+        if collection.find_one({'username': username}):
+            return jsonify({"error": "Username already exists"}), 400
+        
+        hashed_password = hash_password(password)
+        
+        # Insert new user
+        collection.insert_one({'username': username, 'password': hashed_password})
+        return jsonify({"message": "User registered successfully"}), 201
+
+    return render_template('register.html')  # Add a register.html file for the form
+
+limiter = Limiter(get_remote_address, app=app)
+@app.route('/login', methods=['GET', 'POST'])
+@limiter.limit("5 per minute")
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        
+        # Validate user credentials
+        user = collection.find_one({'username': username})
+        if user and verify_password(password, user['password'].encode('utf-8')):
+            session['user'] = username
+            return jsonify({"message": "Login successful"}), 200
+        else:
+            return jsonify({"error": "Invalid username or password"}), 401
+
+    return render_template('login.html')  # Add a login.html file for the form
+
+@app.route('/logout')
+def logout():
+    session.pop('user', None)
+    return jsonify({"message": "Logged out successfully"}), 200
 
 @app.route('/api/search', methods=['POST', 'OPTIONS'])
 def search():
