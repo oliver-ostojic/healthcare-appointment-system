@@ -1,14 +1,12 @@
 import os
-import certifi
+from datetime import datetime
 from bson.objectid import ObjectId, InvalidId
 from flask import Blueprint, request, jsonify
 from pydantic import ValidationError
-from pymongo import MongoClient
-from src.user_service.mongodb_connection import users_collection, provider_schedules_collection
-from ..models.appointment import Appointment, AppointmentStatus
+from src.user_service.mongodb_connection import users_collection, provider_schedules_collection, client
+from ..models.appointment import Appointment
 from ..models.user import User
 from ..models.schedule import Schedule
-import jwt
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -17,8 +15,6 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 uri = os.getenv("MONGODB_URI")
 # Set blueprint
 users_bp = Blueprint('users_bp', __name__)
-# Initialize MongoDB client
-client = MongoClient(uri, tlsCAFile=certifi.where())
 
 
 @users_bp.route('/', methods=['POST'])
@@ -63,18 +59,17 @@ def book_appointment(user_id):
     # Extract appointment fields from the request body
     provider_id = data.get('provider_id')
     start_datetime = data.get('start_datetime')
-    duration = data.get('duration')
     reason = data.get('reason')
     notes = data.get('notes')
     # Validate required fields
-    if not provider_id or not start_datetime or not duration:
-        return jsonify({'message': 'provider_id, start_datetime, and duration are required'}), 400
+    if not provider_id or not start_datetime:
+        return jsonify({'message': 'provider_id and start_datetime are required'}), 400
     # Create appointment object and dict
     else:
-        appointment = Appointment(user_id=user_id,
+        appointment = Appointment(_id=str(ObjectId()),
+                                  user_id=user_id,
                                   provider_id=provider_id,
                                   start_datetime=start_datetime,
-                                  duration=duration,
                                   reason=reason,
                                   notes=notes)
         appointment_dict = appointment.model_dump()
@@ -88,7 +83,7 @@ def book_appointment(user_id):
             if not user:
                 return jsonify({'message': 'User not found'}), 404
             # Fetch the provider's schedule
-            provider_schedule_dict = provider_schedules_collection.find_one({'_id': ObjectId(provider_id)},
+            provider_schedule_dict = provider_schedules_collection.find_one({'provider_id': provider_id},
                                                                             session=session)
             # Covert dict to object
             provider_schedule = Schedule(**provider_schedule_dict)
@@ -100,14 +95,18 @@ def book_appointment(user_id):
             if not available:
                 return jsonify({'message': 'Slot is not available'}), 404
             # Update schedule
-            provider_schedules_collection.update_one({'provider_id': provider_id},
+            result = provider_schedules_collection.update_one({'provider_id': provider_id},
                                                      {'$set': {'availability.$[slot].is_booked': True}},
                                                      array_filters=[{'slot.start_datetime': start_datetime}],
                                                      session=session)
+            if result.modified_count == 0:
+                raise ValueError("Failed to update provider's schedule.")
             # Add new appointment
-            result = users_collection.update_one({'_id': ObjectId(user_id)},
-                                                 {'$push': {'appointments': appointment_dict}},
-                                                 session=session)
+            user_result = users_collection.update_one({'_id': ObjectId(user_id)},
+                                        {'$push': {'appointments': appointment_dict}},
+                                        session=session)
+            if user_result.modified_count == 0:
+                raise ValueError("Failed to add appointment to user's account.")
             # Close session
             session.commit_transaction()
             return jsonify({'message': 'Appointment successfully booked'}), 200
@@ -116,40 +115,44 @@ def book_appointment(user_id):
             return jsonify({'error': str(e)}), 500
 
 
-@users_bp.route('/<user_id>/appointment/<apt_id>', methods=['DEL'])
+@users_bp.route('/<user_id>/appointment/<apt_id>', methods=['DELETE'])
 def cancel_appointment(user_id, apt_id):
-    # Extract data from the request body
-    data = request.get_json()
-    if not data:
-        return jsonify({'message': 'Missing or invalid JSON data'}), 400
     # Proceed with canceling appointment logic
     with client.start_session() as session:
         session.start_transaction()
         try:
             # Get the user data
-            user = users_collection.find_one({'_id': ObjectId(user_id)})
+            user = users_collection.find_one({'_id': ObjectId(user_id)},
+                                             session=session)
             if not user or 'appointments' not in user:
                 return jsonify({'message': 'User or Appointment not found'}), 404
             # Find the specific appointment with apt_id
-            appointment = next((apt for apt in user['appointments'] if apt['_id'] == ObjectId(apt_id)), None)
+            appointment = next((apt for apt in user['appointments'] if apt['id'] == apt_id), None)
             if not appointment:
                 return jsonify({'message': 'Appointment not found'}), 404
             # Delete appointment with apt_id
-            users_collection.update_one({'_id': ObjectId(user_id)},
-                                        {'$pull': {'appointments': {'_id': ObjectId(apt_id)}}},
-                                        session=session)
+            result = users_collection.update_one({'_id': ObjectId(user_id)},
+                                                 {'$pull': {'appointments': {'id': apt_id}}},
+                                                 session=session)
+            if result.modified_count == 0:
+                raise ValueError("Failed to remove appointment from the user document.")
             # Get the provider_id from the appointment
             provider_id = appointment.get('provider_id')
             # Get the start time from the appointment
             start_datetime = appointment.get('start_datetime')
+            # Ensure start_datetime is passed as a string
+            if not isinstance(start_datetime, str):
+                start_datetime = start_datetime.isoformat()
             # Update the provider's schedule to update appointment time_slot status
-            provider_schedules_collection.update_one({'provider_id': provider_id},
-                                                     {'$set': {'availability.$[slot].is_booked': False}},
-                                                     array_filters=[{'slot.start_datetime': start_datetime}],
-                                                     session=session)
+            update_result = provider_schedules_collection.update_one({'provider_id': provider_id},
+                                                                     {'$set': {'availability.$[slot].is_booked': False}},
+                                                                     array_filters=[{'slot.start_datetime': start_datetime}],
+                                                                     session=session)
+            if update_result.modified_count == 0:
+                raise ValueError("Failed to update the provider's schedule.")
             # Close session
             session.commit_transaction()
-            return jsonify({'message': 'Appointment successfully booked'}), 200
+            return jsonify({'message': 'Appointment successfully canceled'}), 200
         except Exception as e:
             session.abort_transaction()
             return jsonify({'error': str(e)}), 500
