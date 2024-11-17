@@ -20,6 +20,24 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+## Features
+
+- [x] Register/Login/Logout
+- [x] Hashed passwords
+- [x] CSRF protection
+- [x] Search providers by location
+- [x] Search providers by specialty
+- [x] Search providers by insurance
+- [x] Book appointments
+- [x] Cancel appointments
+- [x] home.html
+- [] login.html
+- [x] search.html
+- [] results.html
+- [] book.html
+- [] profile.html
+- [] Chatbot
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:
@@ -36,12 +54,14 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
 
 ## Dataset Used:
+
 September 2024 Data Dissemination From cms.gov
 
 The dataset is updated weekly and a new version is released each month with all the weekly changes made. The most-up-to-date version can be found at the following [link](https://www.cms.gov/medicare/regulations-guidance/administrative-simplification/data-dissemination).
 
 ## Geocoding Services Used:
-Nominatim's free [open-source geocoding](https://nominatim.org/) was used along with data from OpenStreetMap data. Instead of using their rate limited online API, install the database on your local machine. 
+
+Nominatim's free [open-source geocoding](https://nominatim.org/) was used along with data from OpenStreetMap data. Instead of using their rate limited online API, install the database on your local machine.
 
 Installation instructions can be found at this [link](https://nominatim.org/release-docs/latest/admin/Installation/)
 
@@ -53,8 +73,8 @@ Using default Postgres settings and 11 threads in geocoding.py, 1000 addresses c
 
 ## System Specifications
 
-CPU: Ryzen 5 3600 
+CPU: Ryzen 5 3600
 
 RAM: 16 GB DDR4 3200 Mhz
 
-SSD: Corsair Force MP510 
+SSD: Corsair Force MP510
