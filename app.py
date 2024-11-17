@@ -147,11 +147,19 @@ def search():
 
     # Add insurance filter if provided
     if insurance:
-        query["insurance"] = {"$regex": insurance, "$options": "i"}
+        # Step 1: Find all provider IDs that match the insurance
+        provider_ids = db["provider-insurance"].distinct(
+            "provider_id", {"insurance_name": {"$regex": insurance, "$options": "i"}}
+        )
+        if not provider_ids:
+            return jsonify({"error": "No providers accept this insurance"}), 404
+
+        # Step 2: Add provider_id filter to the query
+        query["_id"] = {"$in": provider_ids}
 
     try:
+        # Step 3: Query provider-data for results
         results = list(db["provider-data"].find(query))
-        print("Query results:", results)
         return jsonify(results), 200
     except Exception as e:
         print("Error querying the database:", e)
