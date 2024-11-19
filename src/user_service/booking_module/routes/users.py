@@ -1,9 +1,8 @@
 import os
-from datetime import datetime
 from bson.objectid import ObjectId, InvalidId
 from flask import Blueprint, request, jsonify
 from pydantic import ValidationError
-from src.user_service.mongodb_connection import users_collection, provider_schedules_collection, client
+from user_service.mongodb_connection import users_collection, provider_schedules_collection, client
 from ..models.appointment import Appointment
 from ..models.user import User
 from ..models.schedule import Schedule
@@ -96,15 +95,15 @@ def book_appointment(user_id):
                 return jsonify({'message': 'Slot is not available'}), 404
             # Update schedule
             result = provider_schedules_collection.update_one({'provider_id': provider_id},
-                                                     {'$set': {'availability.$[slot].is_booked': True}},
-                                                     array_filters=[{'slot.start_datetime': start_datetime}],
-                                                     session=session)
+                                                              {'$set': {'availability.$[slot].is_booked': True}},
+                                                              array_filters=[{'slot.start_datetime': start_datetime}],
+                                                              session=session)
             if result.modified_count == 0:
                 raise ValueError("Failed to update provider's schedule.")
             # Add new appointment
             user_result = users_collection.update_one({'_id': ObjectId(user_id)},
-                                        {'$push': {'appointments': appointment_dict}},
-                                        session=session)
+                                                      {'$push': {'appointments': appointment_dict}},
+                                                      session=session)
             if user_result.modified_count == 0:
                 raise ValueError("Failed to add appointment to user's account.")
             # Close session
@@ -145,8 +144,10 @@ def cancel_appointment(user_id, apt_id):
                 start_datetime = start_datetime.isoformat()
             # Update the provider's schedule to update appointment time_slot status
             update_result = provider_schedules_collection.update_one({'provider_id': provider_id},
-                                                                     {'$set': {'availability.$[slot].is_booked': False}},
-                                                                     array_filters=[{'slot.start_datetime': start_datetime}],
+                                                                     {'$set': {
+                                                                         'availability.$[slot].is_booked': False}},
+                                                                     array_filters=[
+                                                                         {'slot.start_datetime': start_datetime}],
                                                                      session=session)
             if update_result.modified_count == 0:
                 raise ValueError("Failed to update the provider's schedule.")

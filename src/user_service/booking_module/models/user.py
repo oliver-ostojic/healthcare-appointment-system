@@ -39,7 +39,6 @@ class User(BaseModel):
     appointments: Optional[List[Appointment]] = []
     account_status: AccountStatus = Field(default=AccountStatus.ACTIVE)
     insurance: Insurance
-    address: Address
 
     def full_name(self) -> str:
         return f"{self.name['first']} {self.name['last']}"
