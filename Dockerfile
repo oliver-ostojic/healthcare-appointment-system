@@ -1,5 +1,5 @@
 # Use the official Python image as the base image
-FROM heroku/heroku:20-build
+FROM python:3.12-slim
 
 # Set environment variables to prevent Python from buffering stdout/stderr
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -23,4 +23,4 @@ COPY . /app
 EXPOSE 5000
 
 # Command to run the app with Gunicorn
-CMD ["gunicorn", "-b", "0.0.0.0:5000", "app:app"]
+CMD ["python", "src/user_service/app.py"]
