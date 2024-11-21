@@ -1,4 +1,3 @@
-import pytest
 from utils.geocoding_service import geocode_location
 import requests
 from unittest.mock import patch
