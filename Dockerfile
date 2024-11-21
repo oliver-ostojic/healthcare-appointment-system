@@ -23,4 +23,4 @@ COPY . /app
 EXPOSE 5000
 
 # Command to run the app with Gunicorn
-CMD ["python", "src/user_service/app.py"]
+CMD ["python", "src/provider_service/app.py"]

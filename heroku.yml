@@ -3,4 +3,4 @@ build:
     web: Dockerfile
 
 run:
-  web: python src/user_service/app.py
+  web: python src/provider_service/app.py
