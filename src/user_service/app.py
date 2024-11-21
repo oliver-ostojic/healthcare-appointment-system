@@ -1,5 +1,6 @@
 from flask import Flask
 from flask_wtf.csrf import CSRFProtect
+from flask_cors import CORS
 from dotenv import load_dotenv
 from mongodb_connection import test_connection
 from booking_module.routes.users import users_bp
@@ -12,6 +13,8 @@ def create_app():
 
     app = Flask(__name__)
     csrf = CSRFProtect(app)
+    # CORS will be used for deployment, accepts requests from the frontend defined by the link
+    #CORS(app, resources={r"/api/*": {"origins": "https://design-project-phi.vercel.app/"}})
     # Set secret key for the Flask app
     app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
     # Test MongoDB connection
