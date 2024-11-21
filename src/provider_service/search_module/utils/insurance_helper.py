@@ -1,4 +1,4 @@
-from provider_service.mongodb_connection import db
+from mongodb_connection import db
 
 def get_provider_ids_by_insurance(insurance):
     """

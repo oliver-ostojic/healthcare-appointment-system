@@ -16,7 +16,8 @@ print("Using database: {}".format(db_name))
 try:
     client = MongoClient(uri, tlsCAFile=certifi.where())
     db = client[db_name]
-    providers_collection = db["provider-data"]
+    users_collection = db["users"]
+    provider_schedules_collection = db["provider_schedules"]
 except Exception as e:
     print("Error connecting to MongoDB: {}".format(e))
     raise

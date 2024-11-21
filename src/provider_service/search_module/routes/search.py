@@ -1,8 +1,8 @@
 from flask import Blueprint, request, jsonify
 from search_module.utils.geocoding_service import geocode_location
-from src.provider_service.search_module.utils.insurance_helper import get_provider_ids_by_insurance
-from src.provider_service.search_module.utils.specialty_helper import get_taxonomy_code
-from src.provider_service.mongodb_connection import db
+from ..utils.insurance_helper import get_provider_ids_by_insurance
+from ..utils.specialty_helper import get_taxonomy_code
+from mongodb_connection import db
 
 # Create a Blueprint
 search_bp = Blueprint('search_bp', __name__)
