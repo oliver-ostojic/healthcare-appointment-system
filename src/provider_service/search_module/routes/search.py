@@ -1,20 +1,13 @@
 from flask import Blueprint, request, jsonify
-from pymongo import MongoClient
-from geocode import geocode_location  # Replace with your actual geocoding import
-
-# Initialize MongoDB client (replace connection details with your own)
-client = MongoClient('mongodb://localhost:27017/')
-db = client['your_database_name']
+from search_module.utils.geocoding_service import geocode_location
+from src.provider_service.search_module.utils.insurance_helper import get_provider_ids_by_insurance
+from src.provider_service.search_module.utils.specialty_helper import get_taxonomy_code
 
 # Create a Blueprint
-provider_services_bp = Blueprint('provider_services_bp', __name__)
+search_bp = Blueprint('search_bp', __name__)
 
-@provider_services_bp.route('/api/search', methods=['POST', 'OPTIONS'])
+@search_bp.route('/providers/search', methods=['POST', 'OPTIONS'])
 def search():
-    if request.method == 'OPTIONS':
-        # This handles the CORS preflight request
-        return '', 204
-
     data = request.get_json()
     street = data.get("street")
     city = data.get("city")
@@ -28,7 +21,7 @@ def search():
     radius_meters = radius_miles * 1609.34
 
     # Geocode the location to get latitude and longitude
-    lat, lon = geocode_location(street, city, state, zip_code)
+    lat, lon = geocoding_service(street, city, state, zip_code)
 
     if lat is None or lon is None:
         return jsonify({"error": "Location not found"}), 400
@@ -46,9 +39,9 @@ def search():
         }
     }
 
-    # Look up the taxonomy code for the given specialty
+    # Check if given specialty exists
     if specialty:
-        taxonomy_doc = db["specialty"].find_one({"display_name": {"$regex": specialty, "$options": "i"}})
+        taxonomy_doc = get_taxonomy_code(specialty)
         if taxonomy_doc:
             taxonomy_code = taxonomy_doc.get("code")
             query["taxonomy_codes"] = {"$in": [taxonomy_code]}
@@ -57,9 +50,7 @@ def search():
 
     # Add insurance filter if provided
     if insurance:
-        provider_ids = db["provider-insurance"].distinct(
-            "provider_id", {"insurance_name": {"$regex": insurance, "$options": "i"}}
-        )
+        provider_ids = get_provider_ids_by_insurance(insurance)
         if not provider_ids:
             return jsonify({"error": "No providers accept this insurance"}), 404
         query["_id"] = {"$in": provider_ids}
