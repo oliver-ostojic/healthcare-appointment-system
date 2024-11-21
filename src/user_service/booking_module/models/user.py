@@ -11,10 +11,10 @@ class AccountStatus(str, Enum):
     SUSPENDED = "suspended"
 
 
-class Insurance(BaseModel):
-    group_id: str
-    member_id: str
-    insurance_company_name: str
+# class Insurance(BaseModel):
+#     group_id: str
+#     member_id: str
+#     insurance_company_name: str
 
 
 class Address(BaseModel):
@@ -38,7 +38,7 @@ class User(BaseModel):
     hashed_password: str
     appointments: Optional[List[Appointment]] = []
     account_status: AccountStatus = Field(default=AccountStatus.ACTIVE)
-    insurance: Insurance
+    #insurance: Insurance
 
     def full_name(self) -> str:
         return f"{self.name['first']} {self.name['last']}"

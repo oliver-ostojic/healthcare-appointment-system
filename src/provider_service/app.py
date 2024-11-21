@@ -19,7 +19,7 @@ app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 # Test MongoDB connection
 test_connection()
 # Register blueprints
-app.register_blueprint(search_bp, url_prefix='/users')
+app.register_blueprint(search_bp, url_prefix='/providers')
 
 # Add this block to run the app when the script is executed
 if __name__ == "__main__":
