@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify
 from search_module.utils.geocoding_service import geocode_location
 from src.provider_service.search_module.utils.insurance_helper import get_provider_ids_by_insurance
 from src.provider_service.search_module.utils.specialty_helper import get_taxonomy_code
+from src.provider_service.mongodb_connection import db
 
 # Create a Blueprint
 search_bp = Blueprint('search_bp', __name__)
@@ -21,7 +22,7 @@ def search():
     radius_meters = radius_miles * 1609.34
 
     # Geocode the location to get latitude and longitude
-    lat, lon = geocoding_service(street, city, state, zip_code)
+    lat, lon = geocode_location(street, city, state, zip_code)
 
     if lat is None or lon is None:
         return jsonify({"error": "Location not found"}), 400
