@@ -15,7 +15,6 @@ uri = os.getenv("MONGODB_URI")
 # Set blueprint
 users_bp = Blueprint('users_bp', __name__)
 
-
 @users_bp.route('/', methods=['POST'])
 def create_user():
     try:

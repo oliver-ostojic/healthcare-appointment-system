@@ -6,26 +6,12 @@ from flask_wtf.csrf import CSRFProtect
 from pymongo import MongoClient
 import bcrypt
 import requests
-#from dotenv import load_dotenv
-
-# Load environment variables from .env.local
-#load_dotenv()
 
 app = Flask(__name__)
 csrf = CSRFProtect(app)
 CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000"}})
 client = MongoClient("")
 db = client.MedConnect
-
-# Test the connection by listing the collections in your database
-try:
-    collections = db.list_collection_names()
-    print("Collections in the database:", collections)
-except Exception as e:
-    print("Error connecting to the database:", e)
-    
-# indexes = db["provider-data"].index_information()
-# print("Indexes on provider-data collection:", indexes)
 
 # Hash a password
 def hash_password(password):
