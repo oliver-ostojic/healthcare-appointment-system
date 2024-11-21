@@ -23,3 +23,4 @@ flask-cors
 bcrypt
 flask-limiter
 flask-wtf
+pytest
